@@ -30,7 +30,7 @@ services:
       MYSQL_HOST: "db"
       REDIS_HOST: "redis"
       TZ: "Europe/Paris"
-      NEXTCLOUD_TRUSTED_DOMAINS: "${HOSTNAME}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "${HOSTNAME}:443"
       OVERWRITEHOST: "${HOSTNAME}"
       TRUSTED_PROXIES: "192.168.0.0/16"
 
@@ -57,6 +57,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/syslog:/var/log/syslog:ro
       - logs:/var/log/
       - nextcloud:/nextcloud/
       - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro
