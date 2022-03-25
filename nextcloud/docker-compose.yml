@@ -32,7 +32,7 @@ services:
       TZ: "Europe/Paris"
       NEXTCLOUD_TRUSTED_DOMAINS: "${HOSTNAME}"
       OVERWRITEHOST: "${HOSTNAME}"
-      TRUSTED_PROXIES: "localhost"
+      TRUSTED_PROXIES: "192.168.0.0/16"
 
     env_file:
       - .env
@@ -56,9 +56,7 @@ services:
     image: crowdsecurity/crowdsec:v1.3.2-debian
     restart: unless-stopped
     volumes:
-      - /var/log/journal:/run/log/journal:ro
-      - /var/log/auth.log:/logs/auth.log:ro
-      - /var/log/syslog.log:/logs/syslog.log:ro
+      - /var/log/auth.log:/var/log/auth.log:ro
       - logs:/var/log/
       - nextcloud:/nextcloud/
       - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro
