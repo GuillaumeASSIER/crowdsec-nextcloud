@@ -25,8 +25,7 @@ services:
     restart: unless-stopped
     volumes:
       - nextcloud:/var/www/html
-      - logs:/var/log/nextcloud.log:/var/www/html/data/nextcloud.log
-      - logs:/var/log/apache2/log:/
+      - logs:/var/log/
     environment:
       MYSQL_HOST: "db"
       REDIS_HOST: "redis"
@@ -60,8 +59,8 @@ services:
       - /var/log/journal:/run/log/journal:ro
       - /var/log/auth.log:/logs/auth.log:ro
       - /var/log/syslog.log:/logs/syslog.log:ro
-      - logs:/var/log/nginx/access.log:/var/log/nginx/access.log
-      - logs:/var/log/nextcloud.log:/var/log/nextcloud.log
+      - logs:/var/log/
+      - nextcloud:/nextcloud/
       - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro
       - crowdsec-conf:/conf/etc/crowdsec
       - crowdsec-data:/var/lib/crowdsec/data
@@ -77,7 +76,7 @@ services:
     image: crowdsecurity/openresty:v0.1.7
     restart: unless-stopped
     volumes:
-      - logs:/var/log/nginx/access.log:/var/log/nginx/access.log
+      - logs:/var/log/
       - ./conf.d:/etc/nginx/conf.d/:ro
       - ./crowdsec/crowdsec-openresty-bouncer.conf:/etc/crowdsec/bouncers/crowdsec-openresty-bouncer.conf:ro
       - ./certbot/www/:/var/www/certbot/:ro

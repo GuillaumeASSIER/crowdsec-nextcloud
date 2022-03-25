@@ -1,20 +1,15 @@
 filenames:
   - /var/log/nginx/*.log
-  - ./tests/nginx/nginx.log
 labels:
   type: nginx
+---
+filenames:
+ - /nextcloud/data/nextcloud.log
+labels:
+  type: Nextcloud
 ---
 filenames:
  - /var/log/auth.log
  - /var/log/syslog
 labels:
   type: syslog
----
-filename: /var/log/apache2/*.log
-labels:
-  type: apache2
----
-filenames:
- - /var/log/nextcloud.log
-labels:
-  type: Nextcloud
