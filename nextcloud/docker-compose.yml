@@ -1,0 +1,116 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:10.7.3
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      TZ: "Europe/Paris"
+    networks:
+        nextcloud:
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    networks:
+        nextcloud:
+
+  app:
+    image: nextcloud:latest
+    restart: unless-stopped
+    volumes:
+      - nextcloud:/var/www/html
+      - logs:/var/log/nextcloud.log:/var/www/html/data/nextcloud.log
+      - logs:/var/log/apache2/log:/
+    environment:
+      MYSQL_HOST: "db"
+      REDIS_HOST: "redis"
+      TZ: "Europe/Paris"
+      NEXTCLOUD_TRUSTED_DOMAINS: "${HOSTNAME}"
+      OVERWRITEHOST: "${HOSTNAME}"
+      TRUSTED_PROXIES: "localhost"
+
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+        nextcloud:
+
+  cron:
+    image: nextcloud:apache
+    restart: unless-stopped
+    volumes:
+      - nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+
+  crowdsec:
+    image: crowdsecurity/crowdsec:v1.3.2-debian
+    restart: unless-stopped
+    volumes:
+      - /var/log/journal:/run/log/journal:ro
+      - /var/log/auth.log:/logs/auth.log:ro
+      - /var/log/syslog.log:/logs/syslog.log:ro
+      - logs:/var/log/nginx/access.log:/var/log/nginx/access.log
+      - logs:/var/log/nextcloud.log:/var/log/nextcloud.log
+      - ./crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro
+      - crowdsec-conf:/conf/etc/crowdsec
+      - crowdsec-data:/var/lib/crowdsec/data
+    environment:
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/sshd crowdsecurity/nginx crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/nextcloud"
+      SCNARIOS: "nextcloud-bf"
+      GID: "${GID-1000}"
+      TZ: "Europe/Paris"
+    networks:
+      crowdsec:
+
+  openresty:
+    image: crowdsecurity/openresty:v0.1.7
+    restart: unless-stopped
+    volumes:
+      - logs:/var/log/nginx/access.log:/var/log/nginx/access.log
+      - ./conf.d:/etc/nginx/conf.d/:ro
+      - ./crowdsec/crowdsec-openresty-bouncer.conf:/etc/crowdsec/bouncers/crowdsec-openresty-bouncer.conf:ro
+      - ./certbot/www/:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    env_file:
+      - .env
+    environment:
+      server_name: "${HOSTNAME}"
+    depends_on:
+     - app
+     - db
+     - redis
+     - crowdsec
+    ports:
+     - 80:80
+     - 443:443
+    networks:
+      nextcloud:
+      crowdsec:
+  
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+volumes:
+  db:
+  nextcloud:
+  crowdsec-conf:
+  crowdsec-data:
+  logs:
+
+networks:
+ nextcloud:
+ crowdsec:
