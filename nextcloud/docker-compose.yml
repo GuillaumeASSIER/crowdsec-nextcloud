@@ -65,7 +65,7 @@ services:
       - crowdsec-data:/var/lib/crowdsec/data
     environment:
       COLLECTIONS: "crowdsecurity/linux crowdsecurity/sshd crowdsecurity/nginx crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/nextcloud"
-      SCNARIOS: "nextcloud-bf"
+      SCENARIOS: "nextcloud-bf"
       GID: "${GID-1000}"
       TZ: "Europe/Paris"
     networks:
