@@ -72,7 +72,7 @@ services:
       crowdsec:
 
   openresty:
-    image: crowdsecurity/openresty:v1.0.5
+    image: crowdsecurity/openresty:v1.1.0
     restart: unless-stopped
     volumes:
       - logs:/var/log/
