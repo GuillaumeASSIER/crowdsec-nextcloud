@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:12.3.2
+    image: mariadb:12.3.3
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
     volumes:
