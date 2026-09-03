@@ -51,7 +51,7 @@ services:
       - redis
 
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.8.0-debian
+    image: crowdsecurity/crowdsec:v1.8.1-debian
     restart: unless-stopped
     volumes:
       - /var/log/auth.log:/var/log/auth.log:ro
