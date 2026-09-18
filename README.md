@@ -160,7 +160,7 @@ cscli machines list
 # Voir les bouncers enregistrés
 cscli bouncers list
 
-# Logs en temps réel
+# Voir les collections installées
 cscli hub list
 ```
 
